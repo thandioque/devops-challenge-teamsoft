@@ -7,12 +7,6 @@ on:
     paths:
       - 'src/**'
       - 'nginx/**'
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'src/**'
-      - 'nginx/**'
 
   workflow_dispatch:
 
