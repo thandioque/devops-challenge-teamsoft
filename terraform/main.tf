@@ -73,6 +73,7 @@ module "ec2" {
   public_subnet_id                 = module.vpc.public_subnet_id
   user_data_path                   = var.user_data_path
   ec2_instance_name                = var.ec2_instance_name
+  ebs_device_name                  = var.ebs_device_name
   ebs_volume_size                  = var.ebs_volume_size
   is_most_recent                   = var.is_most_recent
   ami_name_filter                  = var.ami_name_filter

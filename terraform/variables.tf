@@ -278,6 +278,11 @@ variable "ec2_instance_name" {
   default = "server"
 }
 
+variable "ebs_device_name" {
+  type    = string
+  default = "/dev/sda1"
+}
+
 variable "ebs_volume_size" {
   type    = number
   default = 30

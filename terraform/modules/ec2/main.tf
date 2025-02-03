@@ -32,7 +32,7 @@ resource "aws_instance" "server" {
   tags                        = merge({ Name = var.ec2_instance_name }, var.tags)
 
   ebs_block_device {
-    device_name = var.ec2_instance_name
+    device_name = var.ebs_device_name
     volume_size = var.ebs_volume_size
     tags        = merge({ Name = var.ec2_instance_name }, var.tags)
   }

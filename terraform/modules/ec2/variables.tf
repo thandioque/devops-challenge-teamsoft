@@ -22,6 +22,10 @@ variable "ec2_instance_name" {
   type = string
 }
 
+variable "ebs_device_name" {
+  type = string
+}
+
 variable "ebs_volume_size" {
   type = number
 }
