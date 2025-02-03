@@ -41,7 +41,7 @@ jobs:
 
       - name: Setup secret values in the ec2`s install file
         run: |
-          sed -i 's|{{ env.GITHUB_REPOSITORY }}|'"${{ env.GITHUB_REPOSITORY }}"'|g' ./modules/ec2/install.sh
+          sed -i 's|{{ env.GITHUB_REPOSITORY }}|'"${{ github.repository }}"'|g' ./modules/ec2/install.sh
           sed -i 's|{{ secrets.RUNNER_GITHUB_TOKEN }}|'"${{ secrets.RUNNER_GITHUB_TOKEN }}"'|g' ./modules/ec2/install.sh
 
       - name: Terraform fmt
