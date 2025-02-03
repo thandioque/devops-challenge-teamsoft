@@ -7,6 +7,12 @@ on:
     paths:
       - 'src/**'
       - 'nginx/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'nginx/**'
 
   workflow_dispatch:
 
@@ -22,6 +28,7 @@ jobs:
           docker compose -f ./src/docker-compose.yml config
 
   CD:
+    if: github.event_name == 'push'
     runs-on: self-hosted
     needs: [CI]
     steps:
