@@ -30,6 +30,7 @@ resource "aws_vpc_security_group_ingress_rule" "main_thandi_ssh_ingress_rule" {
   ip_protocol       = var.main_ssh_ip_protocol
   to_port           = var.main_ssh_destintion_port
   tags              = merge({ Name = var.main_thandi_ssh_rule_name }, var.tags)
+  description       = var.main_thandi_ssh_sg_descripion
 }
 
 resource "aws_vpc_security_group_ingress_rule" "main_thandi_prometheus_ingress_rule" {
@@ -39,6 +40,7 @@ resource "aws_vpc_security_group_ingress_rule" "main_thandi_prometheus_ingress_r
   ip_protocol       = var.main_prometheus_ip_protocol
   to_port           = var.main_prometheus_destintion_port
   tags              = merge({ Name = var.main_thandi_prometheus_rule_name }, var.tags)
+  description       = var.main_thandi_prometheus_sg_descripion
 }
 
 resource "aws_vpc_security_group_ingress_rule" "main_thandi_node_exporter_ingress_rule" {
@@ -48,6 +50,7 @@ resource "aws_vpc_security_group_ingress_rule" "main_thandi_node_exporter_ingres
   ip_protocol       = var.main_node_exporter_ip_protocol
   to_port           = var.main_node_exporter_destintion_port
   tags              = merge({ Name = var.main_thandi_node_exporter_rule_name }, var.tags)
+  description       = var.main_thandi_node_exporter_sg_descripion
 }
 
 resource "aws_vpc_security_group_ingress_rule" "main_http_ingress_rule" {
@@ -57,6 +60,7 @@ resource "aws_vpc_security_group_ingress_rule" "main_http_ingress_rule" {
   ip_protocol       = var.main_http_ip_protocol
   to_port           = var.main_http_destintion_port
   tags              = merge({ Name = var.main_http_rule_name }, var.tags)
+  description       = var.main_http_cidr_http_sg_descripion
 }
 
 resource "aws_vpc_security_group_egress_rule" "main_allow_all_traffic_egress_rule" {
@@ -64,6 +68,7 @@ resource "aws_vpc_security_group_egress_rule" "main_allow_all_traffic_egress_rul
   cidr_ipv4         = var.main_allow_all_traffic_cidr_ipv4
   ip_protocol       = var.main_allow_all_traffic_ip_protocol
   tags              = merge({ Name = var.main_allow_all_traffic_rule_name }, var.tags)
+  description       = var.main_allow_all_traffic_sg_descripion
 }
 
 # Pubic Subnet

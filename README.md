@@ -535,7 +535,33 @@ aws_secret_access_key = "SEU_SECRET_DE_ACESSO_AWS"
 3. A pipeline de apply do Terraform é acionada sempre que o merge é realizado para a branch main (evento de push) com alteraçōes nos arquivos do Terraform.
 4. A pipeline de destroy do Terraform deve ser acionada manualmente para ser iniciada. Ela está configurada para remover somente os modulos de EC2 e VPC para evitar a remoção do bucket que armazena o state do Terraform no S3 e configurações dessee projeto no Git.
 
-## Instruções adicionais
+## Informações adicionais
 1. Runner do GitHub Actions: O script de instalação configura um runner auto-hospedado na instância EC2. Você pode verificar o status do runner no seu repositório no GitHub.
 2. Acesso ao Grafana: O Grafana estará disponível na porta 80 do servidor EC2. O Nginx fará o proxy reverso para a porta 3000.
 3. Monitoramento: O Prometheus e o Node Exporter já estarão configurados para coletar métricas do servidor, assim como o dashboard responsável por mostrá-las no Grafana. Os acessos ao Prometheus na porta 9090 e Node Exporter na 9100 do servidor EC2 estão liberados somente para o Ip do Thandi por motivos de segurança.
+
+## Observações Finais
+
+Durante o desenvolvimento deste projeto, algumas melhorias e implementações adicionais não foram possíveis devido a limitações de tempo e restrições do plano free-tier da AWS. Abaixo estão algumas das melhorias que poderiam ser consideradas em futuras versões:
+
+1. **Ferramentas de VPN**:
+   A implementação de uma VPN para acesso seguro aos recursos da infraestrutura.
+
+2. **Serviços de Backup**:
+   A configuração de serviços de backup como AWS Backup ou AWS Snapshots para garantir a recuperação de dados em caso de falhas.
+
+3. **Ambiente Kubernetes (k8s)**:
+   A utilização de Kubernetes para orquestração de contêineres, juntamente com Helm para gerenciamento de pacotes, proporcionaria maior escalabilidade e flexibilidade.
+
+4. **Zabbix para Monitoramento**:
+   A implementação do Zabbix como ferramenta de monitoramento foi considerada, mas devido ao alto consumo de CPU em instâncias t3.micro, não foi viável no momento.
+
+6. **Segurança Avançada**:
+   A implementação de políticas de segurança mais rigorosas.
+
+7. **Monitoramento de Logs**:
+   A configuração de outras ferramentas de monitoramento, assim como outros datasources como por exemplo Cloudwatch Logs.
+
+8. **Escalabilidade Automática**:
+   A implementação de Auto Scaling Groups e Load Balancers para garantir que a infraestrutura possa lidar com picos de tráfego de forma eficiente.
+
