@@ -23,11 +23,11 @@ variable "ec2_instance_name" {
 }
 
 variable "ebs_device_name" {
-  type = bool
+  type = string
 }
 
 variable "ebs_is_encrypted" {
-  type = string
+  type = bool
 }
 
 variable "ebs_volume_size" {
