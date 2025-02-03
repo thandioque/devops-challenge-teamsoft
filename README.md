@@ -565,3 +565,5 @@ Durante o desenvolvimento deste projeto, algumas melhorias e implementações ad
 8. **Escalabilidade Automática**:
    A implementação de Auto Scaling Groups e Load Balancers para garantir que a infraestrutura possa lidar com picos de tráfego de forma eficiente.
 
+9. **Configuração de HTTPS e Certificados SSL**:
+   Devido às limitações mencionadas, também não foi possível configurar HTTPS, utilizar certificado SSL ou configurar um domínio customizado para garantir uma comunicação segura entre cliente e servidor.
