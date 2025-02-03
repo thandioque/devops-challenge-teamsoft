@@ -85,11 +85,6 @@ variable "s3_server_ssh_keys_bucket_name" {
   default = "devops-challenge-teamsoft-ssh-keys-bucket"
 }
 
-variable "tags" {
-  type    = map(string)
-  default = {}
-}
-
 # VPC Module
 
 variable "vpc_cidr_block" {
@@ -259,4 +254,81 @@ variable "public_rt_name" {
 variable "public_igw_destination_cidr_block" {
   type    = string
   default = "0.0.0.0/0"
+}
+
+# EC2 Module
+
+variable "is_associate_public_ip_address" {
+  type    = bool
+  default = true
+}
+
+variable "instance_type" {
+  type    = string
+  default = "t3.micro"
+}
+
+variable "user_data_path" {
+  type    = string
+  default = "./modules/ec2/install.sh"
+}
+
+variable "ec2_instance_name" {
+  type    = string
+  default = "server"
+}
+
+variable "is_most_recent" {
+  type    = bool
+  default = true
+}
+
+variable "ami_name_filter" {
+  type    = string
+  default = "ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"
+}
+
+variable "ami_virtualization_type_filter" {
+  type    = string
+  default = "hvm"
+}
+
+variable "ami_architecture_filter" {
+  type    = string
+  default = "x86_64"
+}
+
+variable "ami_owner" {
+  type    = string
+  default = "099720109477"
+}
+
+variable "key_algorithm" {
+  type    = string
+  default = "RSA"
+}
+
+variable "key_rds_bits" {
+  type    = number
+  default = 4096
+}
+
+variable "key_name" {
+  type    = string
+  default = "server-key"
+}
+
+variable "s3_bucket_acl" {
+  type    = string
+  default = "private"
+}
+
+variable "s3_bucket_server_side_encryption" {
+  type    = string
+  default = "AES256"
+}
+
+variable "tags" {
+  type    = map(string)
+  default = {}
 }
