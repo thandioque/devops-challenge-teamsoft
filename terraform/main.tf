@@ -74,6 +74,7 @@ module "ec2" {
   user_data_path                   = var.user_data_path
   ec2_instance_name                = var.ec2_instance_name
   ebs_device_name                  = var.ebs_device_name
+  ebs_is_encrypted                 = var.ebs_is_encrypted
   ebs_volume_size                  = var.ebs_volume_size
   is_most_recent                   = var.is_most_recent
   ami_name_filter                  = var.ami_name_filter

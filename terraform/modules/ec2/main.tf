@@ -33,6 +33,7 @@ resource "aws_instance" "server" {
 
   ebs_block_device {
     device_name = var.ebs_device_name
+    encrypted   = var.ebs_is_encrypted
     volume_size = var.ebs_volume_size
     tags        = merge({ Name = var.ec2_instance_name }, var.tags)
   }
