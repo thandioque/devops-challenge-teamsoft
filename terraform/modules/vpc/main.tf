@@ -66,6 +66,8 @@ resource "aws_vpc_security_group_egress_rule" "main_allow_all_traffic_egress_rul
   tags              = merge({ Name = var.main_allow_all_traffic_rule_name }, var.tags)
 }
 
+# Pubic Subnet
+
 resource "aws_subnet" "main_public" {
   vpc_id                  = aws_vpc.main.id
   availability_zone       = var.public_availability_zone
@@ -74,17 +76,22 @@ resource "aws_subnet" "main_public" {
   tags                    = merge({ Name = var.public_subnet_name }, var.tags)
 }
 
+# Route table
+
 resource "aws_route_table" "main_public" {
   vpc_id = aws_vpc.main.id
   tags   = merge({ Name = var.public_rt_name }, var.tags)
 }
 
+# Route
 resource "aws_route" "main_public_internet_access" {
   # This route enables access to the Internet via the Internet Gateway
   route_table_id         = aws_route_table.main_public.id
   destination_cidr_block = var.public_igw_destination_cidr_block
   gateway_id             = aws_internet_gateway.main.id
 }
+
+# Route table association
 
 resource "aws_route_table_association" "main_public" {
   subnet_id      = aws_subnet.main_public.id

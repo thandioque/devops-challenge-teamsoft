@@ -283,6 +283,11 @@ variable "ebs_device_name" {
   default = "/dev/sda1"
 }
 
+variable "ebs_is_encrypted" {
+  type    = bool
+  default = true
+}
+
 variable "ebs_volume_size" {
   type    = number
   default = 30

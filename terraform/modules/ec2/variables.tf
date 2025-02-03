@@ -26,6 +26,10 @@ variable "ebs_device_name" {
   type = string
 }
 
+variable "ebs_is_encrypted" {
+  type = bool
+}
+
 variable "ebs_volume_size" {
   type = number
 }
