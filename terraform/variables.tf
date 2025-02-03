@@ -38,6 +38,11 @@ variable "git_branch_protection_name" {
   default = "main"
 }
 
+variable "git_branch_protection_require_approval" {
+  type    = number
+  default = 0
+}
+
 variable "aws_access_key_id" {
   type      = string
   sensitive = true
@@ -63,3 +68,24 @@ variable "thandi_cidr_ipv4" {
   sensitive = true
 }
 
+# S3 Module
+
+variable "s3_server_terraform_bucket_name" {
+  type    = string
+  default = "devops-challenge-teamsoft-terraform-bucket"
+}
+
+variable "s3_server_terraform_bucket_versioning" {
+  type    = string
+  default = "Enabled"
+}
+
+variable "s3_server_ssh_keys_bucket_name" {
+  type    = string
+  default = "devops-challenge-teamsoft-ssh-keys-bucket"
+}
+
+variable "tags" {
+  type    = map(string)
+  default = {}
+}

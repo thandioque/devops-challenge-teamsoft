@@ -15,7 +15,7 @@ resource "github_branch_protection" "devops_challenge" {
   pattern       = var.git_branch_protection_name
 
   required_pull_request_reviews {
-    required_approving_review_count = 0
+    required_approving_review_count = var.git_branch_protection_require_approval
   }
 }
 

@@ -22,6 +22,10 @@ variable "git_branch_protection_name" {
   type = string
 }
 
+variable "git_branch_protection_require_approval" {
+  type = string
+}
+
 variable "aws_access_key_id" {
   type = string
 }
