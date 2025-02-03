@@ -54,4 +54,4 @@ jobs:
         run: terraform validate -no-color
 
       - name: Terraform Destroy
-        run: terraform destroy -auto-approve --target module.ec2 --target module.vpc -var -var "thandi_cidr_ipv4=${{ secrets.THANDI_CIDR_IPV4 }}" "runner_github_token=${{ secrets.RUNNER_GITHUB_TOKEN }}" -var "git_auth_token=${{ secrets.GIT_AUTH_TOKEN }}" -var "aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" -var "aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+        run: terraform destroy -auto-approve --target module.ec2 --target module.vpc -var "thandi_cidr_ipv4=${{ secrets.THANDI_CIDR_IPV4 }}" -var "runner_github_token=${{ secrets.RUNNER_GITHUB_TOKEN }}" -var "git_auth_token=${{ secrets.GIT_AUTH_TOKEN }}" -var "aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" -var "aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}"
