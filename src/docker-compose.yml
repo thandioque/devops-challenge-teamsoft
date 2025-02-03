@@ -1,0 +1,45 @@
+networks:
+  network-monitoring:
+    driver: bridge
+
+volumes:
+  grafana-data: {}
+  prometheus-data: {}
+
+services:
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:11.4.0-ubuntu
+    networks:
+      - network-monitoring
+    restart: always
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources/
+      - grafana-data:/var/lib/grafana
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:v3.1.0
+    networks:
+      - network-monitoring
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+
+  node-exporter:
+    container_name: node-exporter
+    image: quay.io/prometheus/node-exporter:v1.8.2
+    networks:
+      - network-monitoring
+    restart: always
+    ports:
+      - "9100:9100"
+

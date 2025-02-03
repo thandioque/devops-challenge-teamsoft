@@ -1,0 +1,60 @@
+name: Server Pipeline CI/CD to EC2
+
+on:
+  push:
+    branches:
+      - main
+      paths:
+        - 'src/**'
+        - 'nginx/**'
+  pull_request:
+    branches:
+      - main
+      paths:
+        - 'src/**'
+        - 'nginx/**'
+
+  workflow_dispatch:
+
+jobs:
+  CI:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4.1.7
+
+      - name: Validate docker-compose.yml
+        run: |
+          docker compose -f ./src/docker-compose.yml config
+
+  CD:
+    runs-on: self-hosted
+    needs: [CI]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4.1.7
+
+      - name: Setup git credentials
+        uses: de-vri-es/setup-git-credentials@v2.1.2
+        with:
+          credentials: https://${{ env.GITHUB_REPOSITORY_OWNER }}:${{ secrets.RUNNER_GITHUB_TOKEN }}@github.com/
+
+      - name: Deploy application using Docker Compose
+        run: |
+          docker compose -f ./src/docker-compose.yml down --remove-orphans
+          docker compose -f ./src/docker-compose.yml up -d
+
+      - name: Setup thr server public IP
+        run: |
+          SERVER_IP=$(curl ifconfig.me)
+          sed "s/$SERVER_IP/$SERVER_IP/g" ./nginx/grafana.conf
+
+      - name: Setup Nginx
+        run: |
+          sudo cp ./nginx/grafana.conf /etc/nginx/sites-available/grafana.conf
+          sudo cp ./nginx/grafana.conf /etc/nginx/sites-enabled/grafana.conf
+
+      - name: Validate Nginx settings and restart the service
+        run: |
+          sudo nginx -t
+          sudo systemctl restart nginx
