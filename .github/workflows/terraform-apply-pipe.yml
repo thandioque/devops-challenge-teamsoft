@@ -39,11 +39,6 @@ jobs:
           echo ${{ secrets.GIT_AUTH_TOKEN }} > token.txt
           gh auth login --with-token < token.txt
 
-      - name: Setup secret values in the ec2`s install file
-        run: |
-          sed -i 's|{{ env.GITHUB_REPOSITORY }}|'"${{ env.GITHUB_REPOSITORY }}"'|g' ./modules/ec2/install.sh
-          sed -i 's|{{ secrets.RUNNER_GITHUB_TOKEN }}|'"${{ secrets.RUNNER_GITHUB_TOKEN }}"'|g' ./modules/ec2/install.sh
-
       - name: Terraform fmt
         id: fmt
         run: terraform fmt -check
