@@ -5,12 +5,7 @@ terraform {
       version = "6.5.0"
     }
   }
-  backend "s3" {
-    bucket  = "devops-challenge-teamsoft-terraform-bucket"
-    key     = "terraform.tfstate"
-    region  = "us-east-1"
-    profile = "terraform"
-  }
+  backend "s3" {}
   required_version = "~> 1.1.9"
 }
 
