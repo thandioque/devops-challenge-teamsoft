@@ -35,6 +35,10 @@ variable "main_ssh_destintion_port" {
   type = number
 }
 
+variable "main_thandi_ssh_sg_descripion" {
+  type = string
+}
+
 variable "main_thandi_ssh_rule_name" {
   type = string
 }
@@ -63,6 +67,10 @@ variable "main_http_destintion_port" {
   type = number
 }
 
+variable "main_http_cidr_http_sg_descripion" {
+  type = string
+}
+
 variable "main_http_rule_name" {
   type = string
 }
@@ -81,6 +89,10 @@ variable "main_prometheus_ip_protocol" {
 
 variable "main_prometheus_destintion_port" {
   type = number
+}
+
+variable "main_thandi_prometheus_sg_descripion" {
+  type = string
 }
 
 variable "main_prometheus_rule_name" {
@@ -103,11 +115,19 @@ variable "main_node_exporter_destintion_port" {
   type = number
 }
 
+variable "main_thandi_node_exporter_sg_descripion" {
+  type = string
+}
+
 variable "main_node_exporter_rule_name" {
   type = string
 }
 
 variable "main_allow_all_traffic_cidr_ipv4" {
+  type = string
+}
+
+variable "main_allow_all_traffic_sg_descripion" {
   type = string
 }
 
