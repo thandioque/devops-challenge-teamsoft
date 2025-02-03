@@ -278,6 +278,11 @@ variable "ec2_instance_name" {
   default = "server"
 }
 
+variable "ebs_volume_size" {
+  type    = number
+  default = 30
+}
+
 variable "is_most_recent" {
   type    = bool
   default = true

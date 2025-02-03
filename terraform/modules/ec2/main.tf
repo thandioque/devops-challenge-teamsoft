@@ -30,6 +30,12 @@ resource "aws_instance" "server" {
   subnet_id                   = var.public_subnet_id
   user_data                   = file(var.user_data_path)
   tags                        = merge({ Name = var.ec2_instance_name }, var.tags)
+
+  ebs_block_device {
+    device_name = var.ec2_instance_name
+    volume_size = var.ebs_volume_size
+    tags        = merge({ Name = var.ec2_instance_name }, var.tags)
+  }
 }
 
 data "aws_ami" "server" {
