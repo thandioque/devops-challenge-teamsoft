@@ -1,6 +1,6 @@
 # DevOps Challenge - Server
 
-Este projeto demonstra a configuração de uma infraestrutura de servidor utilizando Terraform, Docker Compose, Nginx, Grafana e Prometheus, com integração com GitHub Actions para CI/CD. O objetivo principal é provisionar e configurar um servidor para monitoramento e deploy de aplicações, seguindo princípios de Infraestrutura como Código (IaC).
+This project demonstrates the setup of a server infrastructure using Terraform, Docker Compose, Nginx, Grafana, and Prometheus, integrated with GitHub Actions for CI/CD. The main goal is to provision and configure a server for application deployment and monitoring, following Infrastructure as Code (IaC) principles.
 
 This is a challenge by Coodesh.
 
@@ -10,560 +10,440 @@ This is a challenge by Coodesh.
 
 ### 1. **Server Pipeline CI/CD to EC2** (`.github/workflows/server-pipe.yml`)
 
-Esse pipeline é responsável por realizar o CI/CD para uma aplicação hospedada em uma instância EC2. Ele realiza os seguintes passos:
+This pipeline is responsible for performing CI/CD for an application hosted on an EC2 instance. It performs the following steps:
 
-#### Eventos:
-- **push**: Dispara para a branch `main` sempre que houver alteração nos diretórios `src/` ou `nginx/`.
-- **pull_request**: Dispara para a branch `main` em pull requests, quando houver alterações nos diretórios `src/` ou `nginx/`.
-- **workflow_dispatch**: Permite a execução manual do pipeline.
+#### Events:
+- **push**: Triggered on the main branch whenever changes occur in the src/ or nginx/ directories.
+- **pull_request**: Triggered on the main branch for pull requests when changes occur in the src/ or nginx/ directories.
+- **workflow_dispatch**: Allows manual execution of the pipeline.
 
 #### Jobs:
 - **CI**:
-  - **Checkout repository**: Faz checkout do repositório.
-  - **Validate docker-compose.yml**: Valida a configuração do arquivo `docker-compose.yml`.
+  - **Checkout repository**: Checks out the repository.
+  - **Validate docker-compose.yml**: Validates the docker-compose.yml configuration file.
 
 - **CD**:
-  - **Checkout repository**: Faz checkout do repositório.
-  - **Setup git credentials**: Configura as credenciais do Git.
-  - **Deploy application using Docker Compose**: Realiza o deploy da aplicação utilizando o Docker Compose.
-  - **Setup thr server public IP**: Configura o IP público do servidor para substituição no arquivo de configuração do Nginx.
-  - **Setup Nginx**: Configura o Nginx para apontar para o arquivo de configuração correto.
-  - **Validate Nginx settings and restart the service**: Valida as configurações do Nginx e reinicia o serviço.
+  - **Checkout repository**: Checks out the repository.
+  - **Setup git credentials**: Configures Git credentials.
+  - **Deploy application using Docker Compose**: Deploys the application using Docker Compose.
+  - **Setup thr server public IP**: Configures the server's public IP for replacement in the Nginx configuration file.
+  - **Setup Nginx**: Configures Nginx to use the correct configuration file.
+  - **Validate Nginx settings and restart the service**: Validates Nginx settings and restarts the service.
 
 ### 2. **Terraform Apply** (`.github/workflows/terraform-apply-pipe.yml`)
 
-Este pipeline executa o comando `terraform apply` para aplicar as mudanças de infraestrutura na AWS, criando ou alterando recursos de acordo com a configuração do Terraform.
+This pipeline runs the terraform apply command to apply infrastructure changes in AWS, creating or modifying resources according to the Terraform configuration.
 
-#### Eventos:
-- **push**: Dispara para a branch `main` sempre que houver alterações nos arquivos dentro do diretório `terraform/`.
-- **workflow_dispatch**: Permite a execução manual do pipeline.
+#### Events:
+- **push**: Triggered on the main branch whenever changes occur in the terraform/ directory.
+- **workflow_dispatch**: Allows manual execution.
 
 #### Jobs:
 - **apply**:
-  - **Checkout**: Faz checkout do repositório.
-  - **Setup Terraform**: Instala a versão especificada do Terraform.
-  - **Setup github auth**: Configura a autenticação do GitHub com o token fornecido.
-  - **Setup secret values in the EC2's install file**: Substitui valores de variáveis no script de instalação do EC2.
-  - **Terraform fmt**: Verifica se o código do Terraform está formatado corretamente.
-  - **Terraform Init**: Inicializa o Terraform com o backend configurado.
-  - **Terraform Validate**: Valida a configuração do Terraform.
-  - **Terraform Apply**: Aplica as mudanças no Terraform, utilizando variáveis sensíveis passadas através de secrets.
+  - **Checkout**: Checks out the repository.
+  - **Setup Terraform**: Installs the specified Terraform version.
+  - **Setup github auth**: Configures GitHub authentication using the provided token.
+  - **Setup secret values in the EC2's install file**: Replaces variable values in the EC2 installation script.
+  - **Terraform fmt**: Checks if Terraform code is properly formatted.
+  - **Terraform Init**: Initializes Terraform with the configured backend.
+  - **Terraform Validate**: Validates the Terraform configuration.
+  - **Terraform Apply**: Applies infrastructure changes using sensitive variables from secrets.
 
 ### 3. **Terraform Destroy** (`.github/workflows/terraform-destroy-pipe.yml`)
 
-Este pipeline executa o comando `terraform destroy` para destruir os recursos de infraestrutura provisionados pelo Terraform.
+This pipeline runs the terraform destroy command to remove infrastructure resources provisioned by Terraform.
 
-#### Eventos:
-- **workflow_dispatch**: Permite a execução manual do pipeline.
+#### Events:
+- **workflow_dispatch**: Manual execution only.
 
 #### Jobs:
 - **destroy**:
-  - **Checkout**: Faz checkout do repositório.
-  - **Setup Terraform**: Instala a versão especificada do Terraform.
-  - **Setup github auth**: Configura a autenticação do GitHub com o token fornecido.
-  - **Setup secret values in the EC2's install file**: Substitui valores de variáveis no script de instalação do EC2.
-  - **Terraform fmt**: Verifica se o código do Terraform está formatado corretamente.
-  - **Terraform Init**: Inicializa o Terraform com o backend configurado.
-  - **Terraform Validate**: Valida a configuração do Terraform.
-  - **Terraform Destroy**: Destrói os recursos do Terraform, com opções para destruir apenas módulos específicos (ex: EC2 e VPC).
+  - **Checkout**: Checks out the repository.
+  - **Setup Terraform**: Installs the specified Terraform version.
+  - **Setup github auth**: Configures GitHub authentication.
+  - **Setup secret values in the EC2's install file**: Replaces variables in the EC2 installation script.
+  - **Terraform fmt**: Checks formatting.
+  - **Terraform Init**: Initializes Terraform.
+  - **Terraform Validate**: Validates configuration.
+  - **Terraform Destroy**: Destroys infrastructure resources, with options to target specific modules (e.g., EC2 and VPC).
 
 ### 4. **Terraform Plan** (`.github/workflows/terraform-plan-pipe.yml`)
 
-Este pipeline executa o comando `terraform plan` para gerar o plano de execução do Terraform, mostrando as mudanças propostas para a infraestrutura.
+This pipeline runs the terraform plan command to generate an execution plan showing proposed infrastructure changes.
 
-#### Eventos:
-- **pull_request**: Dispara para a branch `main` sempre que houver alterações nos arquivos dentro do diretório `terraform/`.
-- **workflow_dispatch**: Permite a execução manual do pipeline.
+#### Events:
+- **pull_request**: Triggered on changes to Terraform files.
+- **workflow_dispatch**: Manual execution.
 
 #### Jobs:
 - **plan**:
-  - **Checkout**: Faz checkout do repositório.
-  - **Setup Terraform**: Instala a versão especificada do Terraform.
-  - **Setup github auth**: Configura a autenticação do GitHub com o token fornecido.
-  - **Setup secret values in the EC2's install file**: Substitui valores de variáveis no script de instalação do EC2.
-  - **Terraform fmt**: Verifica se o código do Terraform está formatado corretamente.
-  - **Terraform Init**: Inicializa o Terraform com o backend configurado.
-  - **Terraform Validate**: Valida a configuração do Terraform.
-  - **Terraform Plan**: Gera o plano de execução do Terraform.
-  - **Show plan in the Pull Request**: Exibe o plano de execução como um comentário no Pull Request para revisão.
+  - **Checkout**: Checks out the repository.
+  - **Setup Terraform**: Installs Terraform.
+  - **Setup github auth**: Configures authentication.
+  - **Setup secret values in the EC2's install file**: Replaces variable values ​​in the EC2 installation script.
+  - **Terraform fmt**: Checks if the Terraform code is formatted correctly.
+  - **Terraform Init**: Initializes Terraform with the configured backend.
+  - **Terraform Validate**: Validates the Terraform configuration.
+  - **Terraform Plan**: Generates the Terraform execution plan.
+  - **Show plan in the Pull Request**: Displays the execution plan as a comment in the Pull Request for review.
 
-## Componentes de Monitoramento: Grafana, Prometheus e Node Exporter
+## Monitoring Components: Grafana, Prometheus, and Node Exporter
 
-Componentes responsáveis por coletar e visualizar as métricas do servidor e das aplicações.
+Components responsible for collecting and visualizing server and application metrics.
 
-### Componentes
+### Components
 
-*   **Grafana:**  É uma plataforma de visualização de dados e dashboards.  Neste projeto, o Grafana é utilizado para criar dashboards interativos que exibem as métricas coletadas pelo Prometheus.
+*   **Grafana:** A data visualization platform used to create interactive dashboards displaying metrics collected by Prometheus.
 
-*   **Prometheus:** É um sistema de monitoramento e alerta de código aberto.  Ele coleta métricas de vários serviços, armazena-as em um banco de dados time-series e oferece uma linguagem de consulta (PromQL) para analisar esses dados.  Neste projeto, o Prometheus coleta métricas do Node Exporter e dele mesmo.
+*   **Prometheus:** An open-source monitoring and alerting system that collects metrics, stores them as time-series data, and provides a query language (PromQL) to analyze them.
 
-*   **Node Exporter:** É um agente que é executado no servidor e expõe métricas do sistema operacional (CPU, memória, disco, rede, etc.) para o Prometheus.
+*   **Node Exporter:** An agent running on the server that exposes operating system metrics (CPU, memory, disk, network, etc.) to Prometheus.
 
-### Configuração
+### Settings
 
 #### `src/docker-compose.yml`
 
-Este arquivo define os serviços Docker que compõem a solução de monitoramento.
+This file defines the Docker services that make up the monitoring solution.
 
-*   **Rede:** Uma rede bridge chamada `network-monitoring` é criada para permitir a comunicação entre os containers.
-*   **Volumes:** Volumes nomeados `grafana-data` e `prometheus-data` são criados para persistir os dados do Grafana e do Prometheus, respectivamente.
-*   **Serviços:**
-    *   **Grafana:** Utiliza a imagem `grafana/grafana:11.4.0-ubuntu`.  Mapeia as pastas `./grafana/datasources` e `./grafana/dashboard`para provisionar os datasources, dashboards e o volume `grafana-data` para persistir os dados.
-    *   **Prometheus:** Utiliza a imagem `prom/prometheus:v3.1.0`.  Mapeia o arquivo `./prometheus/prometheus.yml` para configurar o Prometheus e o volume `prometheus-data` para persistir os dados.
-    *   **Node Exporter:** Utiliza a imagem `quay.io/prometheus/node-exporter:v1.8.2`.  Expõe as métricas do sistema operacional para o Prometheus.
+* **Network:** A bridge network called `network-monitoring` is created to allow communication between containers.  
+* **Volumes:** Named volumes `grafana-data` and `prometheus-data` are created to persist Grafana and Prometheus data, respectively.  
+* **Services:**
+  * **Grafana:** Uses the image `grafana/grafana:11.4.0-ubuntu`. It maps the folders `./grafana/datasources` and `./grafana/dashboard` to provision datasources and dashboards, and uses the `grafana-data` volume to persist data.
+  * **Prometheus:** Uses the image `prom/prometheus:v3.1.0`. It maps the file `./prometheus/prometheus.yml` to configure Prometheus and uses the `prometheus-data` volume to persist data.
+  * **Node Exporter:** Uses the image `quay.io/prometheus/node-exporter:v1.8.2`. It exposes operating system metrics to Prometheus.
 
 #### `grafana/dashboard/dashboard.yml`
 
-Este arquivo configura o provisionamento de dashboards no Grafana.
+This file configures dashboard provisioning in Grafana.
 
-*   **Providers:** Define um provider chamado "Prometheus" que busca dashboards em arquivos.
-*   **Dashboards:** Especifica que os dashboards devem ser carregados da pasta `/var/lib/grafana/dashboards`.
+* **Providers:** Defines a provider called "Prometheus" that loads dashboards from files.  
+* **Dashboards:** Specifies that dashboards should be loaded from the `/var/lib/grafana/dashboards` folder.
 
 #### `grafana/dashboard/dashboards/node-exporter-dashboard.json`
-Esse arquivo contém o JSON com as configurações do dashboard [Node Exporter Full](https://grafana.com/grafana/dashboards/1860-node-exporter-full/)
+
+This file contains the JSON configuration for the [Node Exporter Full](https://grafana.com/grafana/dashboards/1860-node-exporter-full/) dashboard.
 
 #### `grafana/datasources/datasources.yml`
 
-Este arquivo configura os datasources do Grafana.
+This file configures Grafana datasources.
 
-*   **Datasources:** Define um datasource chamado "Prometheus" que se conecta ao Prometheus na URL `http://prometheus:9090`.
+* **Datasources:** Defines a datasource called "Prometheus" that connects to Prometheus at `http://prometheus:9090`.
 
 #### `prometheus/prometheus.yml`
 
-Este arquivo configura o Prometheus.
+This file configures Prometheus.
 
-*   **Global:** Define configurações globais, como o intervalo de coleta de métricas (`scrape_interval`).
-*   **Scrape Configs:** Define os jobs de coleta de métricas.
-    *   `job_name: 'prometheus'`: Coleta métricas do próprio Prometheus.
-    *   `job_name: 'node'`: Coleta métricas do Node Exporter.
+* **Global:** Defines global settings such as the metrics collection interval (`scrape_interval`).  
+* **Scrape Configs:** Defines metric scraping jobs:
+  * `job_name: 'prometheus'`: Collects metrics from Prometheus itself.
+  * `job_name: 'node'`: Collects metrics from Node Exporter.
 
 ## NGINX
-Configurações do servidor NGINX.
+NGINX server configuration.
 ```
-server ...: Este bloco define um servidor virtual Nginx.
+server ...: This block defines a virtual Nginx server.
 
-listen 80; :  Esta diretiva instrui o Nginx a ouvir na porta 80, a porta padrão para HTTP.  Isso significa que as requisições HTTP para este servidor serão direcionadas para ele.
+listen 80; : This directive instructs Nginx to listen on port 80, the default port for HTTP. This means that HTTP requests to this server will be routed to it.
 
-server_name $SERVER-IP;: Esta diretiva define o nome do servidor.  A variável $SERVER-IP será substituída pelo endereço IP público do servidor onde o Nginx está em execução.
+server_name $SERVER-IP;: This directive defines the server name. The $SERVER-IP variable will be replaced with the public IP address of the server where Nginx is running.
 
-location / ...: Este bloco define como o Nginx deve lidar com as requisições para o caminho /.  Neste caso, todas as requisições para a raiz do servidor serão tratadas pelas diretivas dentro deste bloco.
+location / ...: This block defines how Nginx should handle requests to the root path (/). In this case, all requests to the server root are processed by the directives inside this block.
 
-proxy_pass http://localhost:3000;: Esta diretiva é a chave para o proxy reverso.  Ela instrui o Nginx a encaminhar as requisições para o Grafana, que está ouvindo na porta 3000 do mesmo servidor.
+proxy_pass http://localhost:3000
+;: This directive is the core of the reverse proxy setup. It instructs Nginx to forward requests to Grafana, which is running on port 3000 on the same server.
 
-proxy_http_version 1.1;: Define a versão do protocolo HTTP para 1.1, que é necessária para o correto funcionamento do WebSocket, utilizado pelo Grafana.
+proxy_http_version 1.1;: Sets the HTTP protocol version to 1.1, which is required for proper WebSocket support used by Grafana.
 
-proxy_set_header Upgrade $http_upgrade;:  Esta diretiva repassa o cabeçalho Upgrade da requisição original para o Grafana.  Isso é importante para o estabelecimento de conexões WebSocket.
+proxy_set_header Upgrade $http_upgrade;: This directive forwards the Upgrade header from the original request to Grafana. This is required to establish WebSocket connections.
 
-proxy_set_header Connection 'upgrade';: Esta diretiva repassa o cabeçalho Connection da requisição original para o Grafana, também necessário para o WebSocket.
+proxy_set_header Connection 'upgrade';: This directive forwards the Connection header, also required for WebSocket communication.
 
-proxy_set_header Host $host;:  Esta diretiva repassa o cabeçalho Host da requisição original para o Grafana.  Isso garante que o Grafana saiba qual o host original da requisição.
+proxy_set_header Host $host;: This directive forwards the original Host header to Grafana, ensuring that Grafana is aware of the original request host.
 
-proxy_cache_bypass $http_upgrade;: Esta diretiva impede que o Nginx armazene em cache as requisições WebSocket.
+proxy_cache_bypass $http_upgrade;: This directive prevents Nginx from caching WebSocket requests.
 ```
+
 
 # Terraform
 
-## Módulo de EC2
+## EC2 Module
 
-## Instalação e Configuração do EC2
+## EC2 Installation and Configuration
 
-O módulo `terraform/modules/ec2/install.sh` é um script que automatiza a instalação de pacotes e configurações necessárias em uma instância EC2. Abaixo estão os passos que o script realiza:
+The `terraform/modules/ec2/install.sh` module is a script that automates the installation of required packages and configurations on an EC2 instance.
 
-### Passos do Script `install.sh`:
-- **Atualização de pacotes existentes**: Atualiza os pacotes da máquina Ubuntu.
-- **Instalação de pacotes essenciais**: Instala pacotes como `ca-certificates`, `curl`, `gnupg`, `tar`, `jq` e outros.
-- **Configuração do Docker**:
-  - Adiciona a chave GPG do Docker.
-  - Configura o repositório do Docker.
-  - Instala o Docker e o Docker Compose.
-  - Adiciona o usuário atual ao grupo Docker e reinicia o grupo.
-- **Instalação do Nginx**:
-  - Instala o Nginx.
-  - Remove a configuração padrão do Nginx.
-  - Habilita e inicia o serviço Nginx.
-- **Instalação e Configuração do GitHub Runner**:
-  - Cria o diretório necessário para o runner no usuário `ubuntu`.
-  - Baixa e descompacta o pacote mais recente do GitHub Actions Runner.
-  - Configura o runner com variáveis personalizadas.
-  - Registra o runner com o token do repositório.
-  - Instala e inicia o serviço do runner.
+### `install.sh` Script Steps:
+- **Update existing packages:** Updates Ubuntu packages.
+- **Install essential packages:** Installs packages such as `ca-certificates`, `curl`, `gnupg`, `tar`, `jq`, and others.
+- **Docker setup:**
+  - Adds Docker GPG key.
+  - Configures Docker repository.
+  - Installs Docker and Docker Compose.
+  - Adds the current user to the Docker group and refreshes it.
+- **Nginx setup:**
+  - Installs Nginx.
+  - Removes default configuration.
+  - Enables and starts the Nginx service.
+- **GitHub Runner setup:**
+  - Creates the runner directory for the `ubuntu` user.
+  - Downloads and extracts the latest GitHub Actions Runner package.
+  - Configures the runner with custom variables.
+  - Registers the runner using the repository token.
+  - Installs and starts the runner service.
 
-## Configuração do EC2 com Terraform
+## EC2 Configuration with Terraform
 
-O arquivo `main.tf` define os recursos necessários para criar uma instância EC2 com Terraform. Abaixo está uma explicação sobre os recursos criados:
+The `main.tf` file defines resources required to create an EC2 instance using Terraform.
 
-### Recursos Terraform
+### Terraform Resources
 
-#### Chave SSH
+#### SSH Key
 
-- **`tls_private_key`**: Gera uma chave privada do tipo especificado em `var.key_algorithm`, com o número de bits definido em `var.key_rds_bits`.
-- **`aws_key_pair`**: Cria um par de chaves AWS a partir da chave privada gerada, permitindo o acesso SSH à instância EC2.
+- **`tls_private_key`**: Generates a private key based on `var.key_algorithm` and `var.key_rds_bits`.
+- **`aws_key_pair`**: Creates an AWS key pair from the generated private key.
 
-#### Armazenamento da Chave Privada no S3
+#### Private Key Storage in S3
 
-- **`aws_s3_object`**: Armazena a chave privada gerada no bucket S3 especificado em `var.s3_object_bucket_name`. O arquivo é criptografado no lado do servidor.
+- **`aws_s3_object`**: Stores the generated private key in an S3 bucket with server-side encryption.
 
-#### Instância EC2
+#### EC2 Instance
 
-- **`aws_instance`**: Cria uma instância EC2 com as seguintes configurações:
-  - AMI definida por `data.aws_ami.server.id`.
-  - IP público associado ou não, conforme `var.is_associate_public_ip_address`.
-  - Par de chaves SSH especificado.
-  - Configurações de segurança, como grupos de segurança e sub-rede.
-  - Dados do usuário a partir de um arquivo de `user_data_path`.
-  - Volume EBS adicional com configuração de encriptação e tamanho definidos.
+- **`aws_instance`**: Creates an EC2 instance with:
+  - AMI from `data.aws_ami.server.id`
+  - Optional public IP
+  - SSH key pair
+  - Security group and subnet configuration
+  - User data script (`user_data_path`)
+  - Additional encrypted EBS volume
 
-#### Configuração de AMI
+#### AMI Configuration
 
-- **`data.aws_ami`**: Define o filtro para buscar a imagem AMI mais recente, com base no filtro `name` e outros parâmetros como `architecture` e `virtualization-type`.
+- **`data.aws_ami`**: Retrieves the latest AMI based on filters like name, architecture, and virtualization type.
 
-### Variáveis da Instância EC2
+### EC2 Variables
 
-- **is_associate_public_ip_address** (Tipo: `bool`): Define se a instância EC2 deve ser associada a um IP público.
-- **instance_type** (Tipo: `string`): Tipo da instância EC2 (ex: `t2.micro`, `t3.medium`).
-- **security_group_id** (Tipo: `list(string)`): IDs dos grupos de segurança para a instância EC2.
-- **public_subnet_id** (Tipo: `string`): ID da sub-rede pública onde a instância será criada.
-- **user_data_path** (Tipo: `string`): Caminho para o script de dados do usuário, que será executado na inicialização da instância (ex: `install.sh`).
-- **ec2_instance_name** (Tipo: `string`): Nome da instância EC2.
-- **ebs_device_name** (Tipo: `string`): Nome do dispositivo EBS a ser anexado à instância EC2.
-- **ebs_is_encrypted** (Tipo: `bool`): Define se o volume EBS deve ser criptografado.
-- **ebs_volume_size** (Tipo: `number`): Tamanho do volume EBS em GiB.
-- **is_most_recent** (Tipo: `bool`): Define se a AMI mais recente deve ser usada.
-- **ami_name_filter** (Tipo: `string`): Filtro para o nome da AMI.
-- **ami_virtualization_type_filter** (Tipo: `string`): Filtro para o tipo de virtualização da AMI (ex: `hvm`).
-- **ami_architecture_filter** (Tipo: `string`): Filtro para a arquitetura da AMI (ex: `x86_64`).
-- **ami_owner** (Tipo: `string`): ID do proprietário da AMI.
+- **is_associate_public_ip_address** (`bool`)
+- **instance_type** (`string`)
+- **security_group_id** (`list(string)`)
+- **public_subnet_id** (`string`)
+- **user_data_path** (`string`)
+- **ec2_instance_name** (`string`)
+- **ebs_device_name** (`string`)
+- **ebs_is_encrypted** (`bool`)
+- **ebs_volume_size** (`number`)
+- **is_most_recent** (`bool`)
+- **ami_name_filter** (`string`)
+- **ami_virtualization_type_filter** (`string`)
+- **ami_architecture_filter** (`string`)
+- **ami_owner** (`string`)
 
-### Variáveis de Chave SSH
+### SSH Key Variables
 
-- **key_algorithm** (Tipo: `string`): Algoritmo da chave SSH (ex: `rsa`, `ecdsa`).
-- **key_rds_bits** (Tipo: `number`): Tamanho da chave SSH em bits (ex: `2048`).
-- **key_name** (Tipo: `string`): Nome da chave SSH.
+- **key_algorithm** (`string`)
+- **key_rds_bits** (`number`)
+- **key_name** (`string`)
 
-### Variáveis de S3 para Chave Privada
+### S3 Variables
 
-- **s3_object_bucket_name** (Tipo: `string`): Nome do bucket S3 onde a chave privada SSH será armazenada.
-- **s3_bucket_acl** (Tipo: `string`): ACL do bucket S3.
-- **s3_bucket_server_side_encryption** (Tipo: `string`): Configuração de criptografia do lado do servidor para o bucket S3.
+- **s3_object_bucket_name** (`string`)
+- **s3_bucket_acl** (`string`)
+- **s3_bucket_server_side_encryption** (`string`)
 
-### Variáveis de Tags
+### Tags
 
-- **tags** (Tipo: `map(string)`): Mapa de tags para a instância EC2 e outros recursos.
+- **tags** (`map(string)`)
 
 ## Outputs
 
-As saídas fornecem informações sobre a instância EC2 criada, como o ID da instância e seu endereço IP público.
+- **instance_id**
+- **public_instance_ip**
 
-- **instance_id**: ID da instância EC2 criada.
-- **public_instance_ip**: IP público da instância EC2.
+## GitHub Module
 
-## Módulo de GitHub
+### GitHub Resources
 
-### Recursos do Github
+#### Repository
 
-### Repositório GitHub
+- **data "github_repository"**
+- **resource "github_repository"**
 
-- **data "github_repository" "devops_challenge"**: Obtém informações sobre um repositório GitHub existente com base no nome completo do repositório fornecido.
-- **resource "github_repository" "devops_challenge"**: Configura o repositórido do GitHub com as definiçōes fornecidas.
-  - **name**: Nome do repositório.
-  - **description**: Descrição do repositório.
-  - **visibility**: Visibilidade do repositório (ex: público ou privado).
-  - **delete_branch_on_merge**: Define se o branch será excluído automaticamente após o merge.
+#### Branch Protection
 
-### Proteção de Branch
+- **resource "github_branch_protection"**
 
-- **resource "github_branch_protection" "devops_challenge"**: Configura a proteção de branch para um repositório GitHub.
-  - **repository_id**: ID do repositório a ser protegido.
-  - **pattern**: Nome do branch a ser protegido.
-  - **required_pull_request_reviews**: Requer revisão de pull requests antes do merge.
-    - **required_approving_review_count**: Número de aprovações necessárias antes de permitir o merge.
+#### GitHub Actions Secrets
 
-### GitHub Actions Secrets
+- AWS credentials, runner token, Git token, CIDR config
 
-- **data "github_actions_public_key" "devops_challenge"**: Obtém a chave pública do repositório para permitir a configuração dos segredos no GitHub Actions.
-- **resource "github_actions_secret" "devops_challenge_aws_access_key_id"**: Armazena o segredo da chave de acesso AWS no GitHub Actions.
-- **resource "github_actions_secret" "devops_challenge_aws_secret_access_key"**: Armazena o segredo da chave secreta de acesso AWS no GitHub Actions.
-- **resource "github_actions_secret" "devops_challenge_runner_github_token"**: Armazena o token do GitHub Actions runner.
-- **resource "github_actions_secret" "devops_challenge_git_auth_token"**: Armazena o token de autenticação Git no GitHub Actions.
-- **resource "github_actions_secret" "devops_challenge_thandi_cidr_ipv4"**: Armazena o CIDR IPv4 para o serviço Thandi no GitHub Actions.
+## S3 Module
 
-### Variáveis do Repositório GitHub
+### Resources
 
-- **git_full_repository_name** (Tipo: `string`): Nome completo do repositório GitHub (ex: `user/repo`).
-- **git_repository_name** (Tipo: `string`): Nome do repositório GitHub.
-- **git_repository_description** (Tipo: `string`): Descrição do repositório.
-- **git_repository_visibility** (Tipo: `string`): Visibilidade do repositório (público ou privado).
-- **is_delete_branch_on_merge** (Tipo: `bool`): Define se o branch será excluído após o merge.
-- **git_branch_protection_name** (Tipo: `string`): Nome do branch a ser protegido.
-- **git_branch_protection_require_approval** (Tipo: `string`): Número de aprovações necessárias para permitir o merge.
+- Terraform state bucket (with versioning)
+- SSH key bucket
+- Tags applied to both
 
-### Variáveis de Segredos do GitHub Actions
+### Variables & Outputs
 
-- **aws_access_key_id** (Tipo: `string`): Chave de acesso AWS para ser armazenada no GitHub Actions.
-- **aws_secret_access_key** (Tipo: `string`): Chave secreta de acesso AWS para ser armazenada no GitHub Actions.
-- **runner_github_token** (Tipo: `string`): Token do GitHub Actions runner.
-- **git_auth_token** (Tipo: `string`): Token de autenticação Git para ser armazenado no GitHub Actions.
-- **thandi_cidr_ipv4** (Tipo: `string`): CIDR IPv4 utilizado pelo serviço Thandi no GitHub Actions.
+- Bucket names, versioning, tags
+- Output: SSH key bucket ID
 
-## Módulo de S3
+## VPC Module
 
-### Recursos S3
+### Resources
 
-*   **Bucket para state do Terraform:**
-    *   Cria um bucket S3 usando `aws_s3_bucket` com o nome especificado pela variável `s3_server_terraform_bucket_name`.
-    *   Habilita o versionamento do bucket usando `aws_s3_bucket_versioning`, conforme definido pela variável `s3_server_terraform_bucket_versioning`.
+- VPC
+- Internet Gateway
+- Security Group
+- Ingress rules (SSH, Prometheus, Node Exporter, HTTP)
+- Egress rule (allow all — not recommended for production)
+- Public subnet
+- Route table + association
 
-*   **Bucket para chaves SSH:**
-    *   Cria um bucket S3 usando `aws_s3_bucket` com o nome especificado pela variável `s3_server_ssh_keys_bucket_name`.
+### Variables & Outputs
 
-*   **Tags:** Ambos os buckets recebem tags definidas pela variável `tags`.
+- CIDR blocks, ports, protocols, AZ, tags
+- Outputs: subnet ID, security group ID
 
-#### Variaveis
-
-Este arquivo define as variáveis de entrada do módulo S3. Inclui variáveis para:
-
-*   Nomes dos buckets (`s3_server_terraform_bucket_name` e `s3_server_ssh_keys_bucket_name`).
-*   Status do versionamento do bucket para state do Terraform (`s3_server_terraform_bucket_versioning`).
-*   Tags (`tags`).
-
-#### Outputs
-
-Este arquivo define as saídas do módulo S3.
-
-*   **`s3_bucket_server_ssh_keys`:** Exporta o ID do bucket para chaves SSH.
-
-## Módulo de VPC
-
-### Recursos da VPC
-
-*   **VPC:**
-    *   Cria uma VPC usando `aws_vpc` com o CIDR block especificado pela variável `vpc_cidr_block`.
-    *   Adiciona tags definidas pela variável `tags` e combinadas com o nome da VPC (`vpc_name`).
-
-*   **Internet Gateway:**
-    *   Cria um Internet Gateway usando `aws_internet_gateway`.
-    *   Associa o Internet Gateway à VPC.
-    *   Adiciona tags definidas pela variável `tags` e combinadas com o nome do Internet Gateway (`igw_name`).
-
-*   **Security Group:**
-    *   Cria um security group usando `aws_security_group` com o nome (`sg_name`) e descrição (`sg_description`) especificados nas variáveis.
-    *   Associa o security group à VPC.
-    *   Adiciona tags definidas pela variável `tags` e combinadas com o nome do security group (`sg_name`).
-
-*   **Regras de Entrada (Ingress):**
-    *   Define regras de entrada para permitir tráfego SSH, Prometheus, Node Exporter e HTTP, todos provenientes do CIDR block `main_thandi_cidr_ipv4`. As portas e protocolos são definidos por variáveis.
-
-*   **Regra de Saída (Egress):**
-    *   Define uma regra de saída que permite todo o tráfego para qualquer destino (`0.0.0.0/0`).  **Atenção:** Esta regra é muito permissiva e deve ser restringida para um ambiente de produção.
-
-*   **Subnet Pública:**
-    *   Cria uma subnet pública usando `aws_subnet`.
-    *   Associa a subnet à VPC.
-    *   Define `map_public_ip_on_launch` para `true` para que as instâncias lançadas nesta subnet recebam um IP público.
-    *   Adiciona tags definidas pela variável `tags` e combinadas com o nome da subnet (`public_subnet_name`).
-
-*   **Tabela de Rotas:**
-    *   Cria uma tabela de rotas pública usando `aws_route_table`.
-    *   Associa a tabela de rotas à VPC.
-    *   Adiciona tags definidas pela variável `tags` e combinadas com o nome da tabela de rotas (`public_rt_name`).
-
-*   **Rota:**
-    *   Cria uma rota na tabela de rotas pública para o Internet Gateway, permitindo acesso à internet.
-
-*   **Associação da Tabela de Rotas:**
-    *   Associa a tabela de rotas pública à subnet pública.
-
-#### Variáveis
-
-Este arquivo define as variáveis de entrada do módulo VPC.  Inclui variáveis para:
-
-*   CIDR block da VPC (`vpc_cidr_block`).
-*   Nomes da VPC, Internet Gateway, security group, subnet e tabela de rotas.
-*   Descrição do security group.
-*   CIDR block para regras de entrada (`main_thandi_cidr_ipv4`).
-*   Portas e protocolos para as regras de entrada (SSH, Prometheus, Node Exporter, HTTP).
-*   CIDR block e protocolo para a regra de saída (`main_allow_all_traffic_cidr_ipv4` e `main_allow_all_traffic_ip_protocol`).
-*   Zona de disponibilidade da subnet pública (`public_availability_zone`).
-*   CIDR block da subnet pública (`public_subnet_cidr_block`).
-*   Variável para habilitar a atribuição de IP público na subnet pública (`is_map_public_ip_on_launch`).
-*   Tags (`tags`).
-
-#### Outputs
-
-Este arquivo define as saídas do módulo VPC.
-
-*   **`public_subnet_id`:** Exporta o ID da subnet pública.
-*   **`security_group_id`:** Exporta o ID do security group.
-
-## Arquivos Root do Terraform
+## Terraform Root Files
 
 ### `main.tf`
 
-Este arquivo define os módulos que compõem a infraestrutura. Ele chama os módulos S3, Git, VPC e EC2, passando as variáveis necessárias para cada um deles.
+Calls modules:
+- S3
+- Git
+- VPC
+- EC2
 
-*   **Módulo S3:**
-    *   Chama o módulo S3, responsável pela criação dos buckets para state do Terraform e chaves SSH.
-    *   Passa as variáveis `s3_server_terraform_bucket_name`, `s3_server_terraform_bucket_versioning`, `s3_server_ssh_keys_bucket_name` e `tags`.
+### Variables
 
-*   **Módulo Git:**
-    *   Chama o módulo Git, responsável pela configuração do repositório no GitHub.
-    *   Passa as variáveis `git_full_repository_name`, `git_repository_name`, `git_repository_description`, `git_repository_visibility`, `is_delete_branch_on_merge`, `git_branch_protection_name`, `git_branch_protection_require_approval`, `aws_access_key_id`, `aws_secret_access_key`, `runner_github_token`, `git_auth_token` e `thandi_cidr_ipv4`.
+Covers:
+- AWS region
+- GitHub config
+- S3 config
+- VPC config
+- EC2 config
+- Tags
 
-*   **Módulo VPC:**
-    *   Chama o módulo VPC, responsável pela criação da infraestrutura de rede.
-    *   Passa as variáveis `vpc_cidr_block`, `vpc_name`, `igw_name`, `sg_name`, `sg_description`, `thandi_cidr_ipv4`, `main_ssh_source_port`, `main_ssh_ip_protocol`, `main_ssh_destintion_port`, `main_thandi_ssh_rule_name`, `main_thandi_prometheus_rule_name`, `main_thandi_node_exporter_rule_name`, `main_http_cidr_ipv4`, `main_http_source_port`, `main_http_ip_protocol`, `main_http_destintion_port`, `main_http_rule_name`, `main_prometheus_cidr_ipv4`, `main_prometheus_source_port`, `main_prometheus_ip_protocol`, `main_prometheus_destintion_port`, `main_prometheus_rule_name`, `main_node_exporter_cidr_ipv4`, `main_node_exporter_source_port`, `main_node_exporter_ip_protocol`, `main_node_exporter_destintion_port`, `main_node_exporter_rule_name`, `main_allow_all_traffic_cidr_ipv4`, `main_allow_all_traffic_ip_protocol`, `main_allow_all_traffic_rule_name`, `public_availability_zone`, `public_subnet_cidr_block`, `is_map_public_ip_on_launch`, `public_subnet_name`, `public_rt_name`, `public_igw_destination_cidr_block` e `tags`.
-    *   **Obs**: Note que algumas variáveis são definidas diretamente, enquanto outras, como os CIDR blocks para Prometheus e Node Exporter, são obtidas a partir do módulo EC2.
+### `locals.tf`
 
-*   **Módulo EC2:**
-    *   Chama o módulo EC2, responsável pela criação da instância EC2.
-    *   Passa as variáveis `is_associate_public_ip_address`, `instance_type`, `security_group_id`, `public_subnet_id`, `user_data_path`, `ec2_instance_name`, `ebs_device_name`, `ebs_is_encrypted`, `ebs_volume_size`, `is_most_recent`, `ami_name_filter`, `ami_virtualization_type_filter`, `ami_architecture_filter`, `ami_owner`, `tags`, `key_algorithm`, `key_rds_bits`, `key_name`, `s3_object_bucket_name`, `s3_bucket_acl` e `s3_bucket_server_side_encryption`.  **Obs**: Os IDs do security group e da subnet são obtidos a partir do módulo VPC.
-
-### Variáveis
-
-Este arquivo define as variáveis que são utilizadas nos módulos e na configuração principal do Terraform. As variáveis permitem parametrizar a infraestrutura, tornando-a mais flexível e reutilizável.
-
-As variáveis abrangem diversas áreas, incluindo:
-
-*   **Providers:** Região da AWS.
-*   **Módulo Git:** Configurações do repositório Git, credenciais de acesso e configurações de proteção de branch.
-*   **Módulo S3:** Nomes dos buckets S3 e configurações de versionamento.
-*   **Módulo VPC:** Configurações da VPC, Internet Gateway, security group, regras de entrada e saída, subnet pública e tabela de rotas.
-*   **Módulo EC2:** Configurações da instância EC2, volume EBS, AMI, par de chaves SSH e acesso ao S3.
-*   **Tags:** Tags comuns para todos os recursos.
-
-### Locals (`locals.tf`)
-
-Este arquivo define variáveis locais, que são valores que podem ser calculados ou definidos internamente no seu código Terraform.
-
-#### `locals`
-
-O bloco `locals` define um mapa chamado `common_tags`. Este mapa contém tags que serão aplicadas a todos os recursos da infraestrutura. As tags são pares chave-valor que ajudam a organizar e identificar os recursos. Neste caso, as tags definidas são:
+Defines:
 
 *   `Project: "Server"`
 *   `Managedby: "Terraform"`
 *   `Owner: "Thandi"`
 
-**Observação:** A utilização de um bloco `locals` para definir tags comuns foi uma prática utilizada para evitar repetição de código, promover a consistência e facilitar a manutenção do código.
-
 ### Outputs
 
-Este arquivo define as saídas (outputs) do Terraform. Neste caso, o arquivo `output.tf` define uma saída chamada `public_instance_ip`, que contém o endereço IP público da instância EC2 criada.
+- `public_instance_ip`
 
-## Arquivos de Configuração Terraform
+## Terraform Configuration Files
 
 ### Backend (`backend.hcl`)
 
-Este arquivo configura o backend do Terraform, que é responsável por armazenar o state do Terraform. O state contém informações sobre a infraestrutura gerenciada pelo Terraform e é crucial para o planejamento e aplicação de mudanças.
-
-Neste caso, o backend utilizado é o S3. O arquivo `backend.hcl` especifica:
-
-*   `bucket`: O nome do bucket S3 onde o state será armazenado.
-*   `key`: A chave (nome do arquivo) dentro do bucket S3 onde o state será salvo.
-*   `region`: A região da AWS onde o bucket S3 está localizado.
+- S3 bucket
+- Key
+- Region
 
 ### Provider (`provider.tf`)
 
-Este arquivo define os providers do Terraform, que são plugins que permitem ao Terraform interagir com as APIs de diferentes serviços, como AWS e GitHub.
+- AWS provider
+- GitHub provider
+- Terraform version constraint
 
-#### `terraform`
+## Technologies Used
 
-O bloco `terraform` define configurações para o próprio Terraform.
+- Terraform
+- Docker / Docker Compose
+- Nginx
+- Grafana
+- Prometheus
+- Node Exporter
+- GitHub Actions
+- AWS
+- Ubuntu LTS
+- Bash
 
-*   `required_providers`: Este bloco especifica os providers necessários para o projeto e suas versões.
-    *   `aws`: O provider da AWS permite ao Terraform gerenciar recursos na AWS. A versão especificada é 5.84.0.
-    *   `github`: O provider do GitHub permite ao Terraform interagir com a API do GitHub. A versão especificada é 6.5.0.
+## Notes
 
-*   `backend "s3" {}`: Este bloco configura o backend do Terraform para usar o S3. O backend é responsável por armazenar o state do Terraform, que contém informações sobre a infraestrutura gerenciada. A configuração específica do bucket S3, chave e região estão definidas no arquivo `backend.hcl`.
+The variable `main_thandi_cidr_ipv4` restricts access for security, allowing only one IP. Only HTTP (port 80) is publicly accessible.
 
-*   `required_version = "~> 1.1.9"`: Esta linha especifica a versão mínima do Terraform necessária para executar o projeto.
+## Installation
 
-#### `provider "aws" {}`
+### Prerequisites
 
-Este bloco configura o provider da AWS.
+- AWS account
+- GitHub account
+- Terraform
+- Docker + Compose
+- AWS CLI
 
-*   `region = var.aws_region`: Define a região da AWS onde os recursos serão criados.
+### Local Setup
 
-#### `provider "github" {}`
-
-Este bloco configura o provider do GitHub. Nenhuma configuração específica é definida aqui, pois a autenticação está sendo realizada nas pipelines.
-
-## Linguagens, Frameworks e Tecnologias Utilizadas
-
-* **Terraform**: Ferramenta para IaC, utilizada para provisionar e gerenciar a infraestrutura na AWS.
-* **Docker**: Plataforma de contêinerização, utilizada para empacotar e executar as aplicações de forma consistente.
-* **Docker Compose**: Ferramenta para definir e gerenciar aplicações multi-container Docker
-* **Nginx**: Servidor web e proxy reverso, utilizado para servir o Grafana e outras aplicações.
-* **Grafana**: Ferramenta de visualização e monitoramento, utilizada para criar dashboards e alertas.
-* **Prometheus**: Sistema de monitoramento e alerta, utilizado para coletar métricas do servidor e das aplicações.
-* **Node Exporter**: Agente que coleta métricas do sistema operacional e expõe para o Prometheus.
-* **GitHub Actions**: Plataforma de CI/CD do GitHub, utilizada para automatizar o deploy e outras tarefas.
-* **AWS**: Provedor de nuvem onde a infraestrutura é provisionada.
-* **Ubuntu LTS**: Sistema operacional utilizado no servidor.
-* **Bash**: Linguagem de script utilizada nos arquivos de configuração e instalação.
-
-## Observação
-A variável (`main_thandi_cidr_ipv4`) foi configurada por motivos de segurança permitindo que somente a máquina com esse IP consiga acessar as páginas das ferramentas e realizar o SSH. Somente a porta do HTTP(`80`) foi liberada para acesso totalmente público.
-
-## Como Instalar
-### Pré-requisitos
-* Conta na AWS com permissões para criar os recursos utilizados no projeto.
-* Conta no GitHub com permissões para configurar o projeto.
-* Terraform instalado na máquina (se for executar localmente).
-* Docker e Docker Compose instalados (se for executar localmente).
-* AWS CLI configurado com suas credenciais (se for executar localmente).
-
-### Instalação
-A instalação das ferramentas é realizada no arquivo
-
-### Instalação local
-1. Clone o repositório: git clone https://github.com/thandioque/devops-challenge-teamsoft.git
-2. Acesse o diretório do projeto: cd devops-challenge-teamsoft
-
-### Configuração
-1.  **Variáveis de ambiente**: As variaveis estão configuradas na secret do projeto, mas caso o objetivo seja executar localmente, defina as variáveis de ambiente necessárias. Você pode criar um arquivo .tfvars na raiz do projeto e preencher com os valores. Exemplo:
-```
-aws_access_key_id = "SUA_CHAVE_DE_ACESSO_AWS"
-aws_secret_access_key = "SEU_SECRET_DE_ACESSO_AWS"
-# ... outras variáveis
+```bash
+git clone https://github.com/thandioque/devops-challenge-teamsoft.git
+cd devops-challenge-teamsoft
 ```
 
-### Backend: O arquivo terraform/backend.hcl já está configurado para armazenar o state no S3.
+## Environment Variables
 
-## Uso
-1. A pipeline de CI/CD é acionada quando ocorrem modificações nos diretórios ./src e ./nginx, sendo que o job de CI é executado quando o PR é criado para a branch main e ambos os jobs quando o merge é realizado para a branch main (evento de push ).
-2. A pipeline de plan do Terraform é acionada sempre que o PR é criado para a branch main com alteraçōes nos arquivos do Terraform.
-3. A pipeline de apply do Terraform é acionada sempre que o merge é realizado para a branch main (evento de push) com alteraçōes nos arquivos do Terraform.
-4. A pipeline de destroy do Terraform deve ser acionada manualmente para ser iniciada. Ela está configurada para remover somente os modulos de EC2 e VPC para evitar a remoção do bucket que armazena o state do Terraform no S3 e configurações dessee projeto no Git.
+Example `.tfvars` file:
 
-## Informações adicionais
-1. Runner do GitHub Actions: O script de instalação configura um runner auto-hospedado na instância EC2. Você pode verificar o status do runner no seu repositório no GitHub.
-2. Acesso ao Grafana: O Grafana estará disponível na porta 80 do servidor EC2. O Nginx fará o proxy reverso para a porta 3000.
-3. Monitoramento: O Prometheus e o Node Exporter já estarão configurados para coletar métricas do servidor, assim como o dashboard responsável por mostrá-las no Grafana. Os acessos ao Prometheus na porta 9090 e Node Exporter na 9100 do servidor EC2 estão liberados somente para o Ip do Thandi por motivos de segurança.
+```hcl
+aws_access_key_id     = "YOUR_AWS_ACCESS_KEY"
+aws_secret_access_key = "YOUR_AWS_SECRET_KEY"
+# ... other variables
+```
 
-## Observações Finais
+## Usage
 
-Durante o desenvolvimento deste projeto, algumas melhorias e implementações adicionais não foram possíveis devido a limitações de tempo e restrições do plano free-tier da AWS. Abaixo estão algumas das melhorias que poderiam ser consideradas em futuras versões:
+- The CI/CD pipeline is triggered when changes are made to the `src/` and `nginx/` directories:
+  - The **CI job** runs when a Pull Request is opened targeting the `main` branch.
+  - Both **CI and CD jobs** run when changes are merged into the `main` branch.
 
-1. **Ferramentas de VPN**:
-   A implementação de uma VPN para acesso seguro aos recursos da infraestrutura.
+- The **Terraform Plan** pipeline runs automatically when a Pull Request is created with changes in the Terraform files.
 
-2. **Serviços de Backup**:
-   A configuração de serviços de backup como AWS Backup ou AWS Snapshots para garantir a recuperação de dados em caso de falhas.
+- The **Terraform Apply** pipeline runs when changes to Terraform files are merged into the `main` branch.
 
-3. **Ambiente Kubernetes (k8s)**:
-   A utilização de Kubernetes para orquestração de contêineres, juntamente com Helm para gerenciamento de pacotes, proporcionaria maior escalabilidade e flexibilidade.
+- The **Terraform Destroy** pipeline must be triggered manually.  
+  It is configured to destroy only the EC2 and VPC modules, preventing accidental deletion of:
+  - The S3 bucket used for Terraform state
+  - GitHub-related configurations
 
-4. **Zabbix para Monitoramento**:
-   A implementação do Zabbix como ferramenta de monitoramento foi considerada, mas devido ao alto consumo de CPU em instâncias t3.micro, não foi viável no momento.
+## Additional Information
 
-6. **Segurança Avançada**:
-   A implementação de políticas de segurança mais rigorosas.
+- A **self-hosted GitHub Actions runner** is configured on the EC2 instance.
 
-7. **Monitoramento de Logs**:
-   A configuração de outras ferramentas de monitoramento, assim como outros datasources como por exemplo Cloudwatch Logs.
+- **Grafana** is accessible via port **80** on the EC2 instance, with Nginx acting as a reverse proxy to port **3000**.
 
-8. **Escalabilidade Automática**:
-   A implementação de Auto Scaling Groups e Load Balancers para garantir que a infraestrutura possa lidar com picos de tráfego de forma eficiente.
+- **Prometheus (port 9090)** and **Node Exporter (port 9100)** are restricted to a specific IP address for security purposes.
 
-9. **Configuração de HTTPS e Certificados SSL**:
-   Devido às limitações mencionadas, também não foi possível configurar HTTPS, utilizar certificado SSL ou configurar um domínio customizado para garantir uma comunicação segura entre cliente e servidor.
+## Final Notes
+
+### Future Improvements
+
+Due to time constraints and AWS free-tier limitations, some enhancements were not implemented but could be considered in future iterations:
+
+- **VPN setup**  
+  Implement a VPN solution to provide secure access to infrastructure resources.
+
+- **Backup services**  
+  Configure backup solutions such as AWS Backup or EBS Snapshots to ensure data recovery.
+
+- **Kubernetes (k8s + Helm)**  
+  Introduce Kubernetes for container orchestration and Helm for package management to improve scalability.
+
+- **Zabbix monitoring**  
+  Evaluate Zabbix as an alternative monitoring solution (not implemented due to resource constraints).
+
+- **Advanced security policies**  
+  Apply stricter security rules and best practices for production environments.
+
+- **Log monitoring**  
+  Integrate logging solutions such as CloudWatch Logs or other observability tools.
+
+- **Auto Scaling & Load Balancing**  
+  Implement Auto Scaling Groups and Load Balancers to handle traffic spikes efficiently.
+
+- **HTTPS & SSL certificates**  
+  Configure HTTPS with SSL certificates and a custom domain to ensure secure communication.
